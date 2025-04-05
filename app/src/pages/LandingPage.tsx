@@ -15,7 +15,7 @@ export default function LandingPage() {
       <main className="flex flex-grow items-center justify-center px-4 md:px-8 z-20">
         <div className="flex flex-col text-center w-full gap-2 fade-in">
           {/* Large Title with hover animation */}
-          <h1 className="text-[12rem] font-bold tracking-tight text-blue-800 font-theme tracking-wide mb-2 text-shadow-sm 
+          <h1 className="text-[10rem] font-bold tracking-tight text-blue-800 font-theme tracking-wide mb-2 text-shadow-sm 
               transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:scale-[1.01]">
             C.O.G.N.I  
           </h1>
