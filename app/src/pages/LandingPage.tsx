@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import Button from "@/components/ui/Button";
 import Navbar from "@/components/ui/Navbar";
 
 export default function LandingPage() {
@@ -18,8 +18,8 @@ export default function LandingPage() {
                 <p>Stay focused, track your attention, and learn how to lock in.</p>
           </p>
           <div className="flex justify-center gap-6 pt-2">
-            <Button size="lg" variant="blue">Learn More</Button>
-            <Button size="lg" variant="blue">Try It</Button>
+            <Button text="Learn More"/>
+            <Button text="Try it out!"/>
           </div>
         </div>
       </main>
