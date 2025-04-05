@@ -6,10 +6,13 @@ import ParticleComponent from "@/components/ui/Particles";
 export default function LandingPage() {
   return (
     <div className="flex flex-col bg-white text-blue-900 min-h-screen w-full">
-      <ParticleComponent />
+       {/* Particles Background with Blur */}
       <Navbar />
+      <div className="absolute inset-0 z-0 blur-xs">
+        <ParticleComponent />
+      </div>
       {/* Main Content */}
-      <main className="flex flex-grow items-center justify-center px-4 md:px-8">
+      <main className="flex flex-grow items-center justify-center px-4 md:px-8 z-20">
         <div className="flex flex-col text-center w-full gap-2 fade-in">
           
           {/* Large Title */}
