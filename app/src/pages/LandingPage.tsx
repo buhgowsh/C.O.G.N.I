@@ -1,21 +1,11 @@
 import { Button } from "@/components/ui/button"
-import { Menu } from "lucide-react"
+import Navbar from "@/components/ui/Navbar";
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col bg-white text-blue-900 min-h-screen w-full ">
-      {/* Navbar */}
-      <header className="w-full px-6 py-4 shadow-sm flex items-center justify-between border-b border-gray-200">
-        <div className="text-2xl font-bold tracking-wide">C.O.G.N.I</div>
-        <nav className="hidden md:flex space-x-4">
-          <Button variant="blue">About</Button>
-          <Button variant="blue">Record</Button>
-        </nav>
-        <div className="md:hidden">
-          <Menu className="w-6 h-6" />
-        </div>
-      </header>
-
+      {/* Navbar */}    
+      <Navbar/>
       {/* Main Content */}
       <main className="flex flex-grow items-center justify-center px-4">
         <div className="flex flex-col text-center space-y-6 max-w-lg">
