@@ -1,10 +1,14 @@
-import { Button } from "@/components/ui/button"
+import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom"
+import LandingPage from "./pages/LandingPage"
 
 function App() {
   return (
-    <div className="flex items-center justify-center h-screen w-screen">
-      <Button>Click me</Button>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   )
 }
 
