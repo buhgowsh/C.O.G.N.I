@@ -1,23 +1,23 @@
 import { Link } from "react-router-dom";
 import Button from "@/components/ui/Button";
 import Navbar from "@/components/ui/Navbar";
+import ParticleComponent from "@/components/ui/Particles";
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col bg-white text-blue-900 min-h-screen w-full">
-      {/* Navbar */}
+      <ParticleComponent />
       <Navbar />
-      
       {/* Main Content */}
       <main className="flex flex-grow items-center justify-center px-4 md:px-8">
         <div className="flex flex-col text-center w-full gap-2 fade-in">
           
           {/* Large Title */}
-          <h1 className="text-[10rem] font-bold tracking-tight text-blue-800 font-theme tracking-widest">
+          <h1 className="text-[12rem] font-bold tracking-tight text-blue-800 font-theme tracking-wide mb-2">
             C.O.G.N.I  
           </h1>
           
-          <div className="w-full h-auto mb-6">
+          <div className="w-full h-auto  relative bottom-10">
             {/* Description of what it does */}
             <p className="text-2xl md:text-2xl font-semibold text-blue-500 mb-6">
               Cognitive Optimization for Neurodivergent Individuals. 
