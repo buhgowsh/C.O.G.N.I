@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"; // Fixed import
 
 export default function Navbar() {
   return (
-    <header className="fixed top-8 left-1/2 -translate-x-1/2 w-[90%] max-5xl px-8 py-3 flex items-center justify-between border border-blue-700 rounded-3xl shadow-lg z-50 bg-white/90 backdrop-blur-sm">
+    <header className="fixed top-8 left-1/2 -translate-x-1/2 w-[90%] max-5xl px-8 py-3 flex items-center justify-between border border-blue-700 rounded-3xl shadow-2xl z-50 bg-white/90 backdrop-blur-sm">
       {/* Logo */}
       <div className="text-2xl font-bold tracking-wide font-theme text-blue-800 pl-2">
         C.O.G.N.I
