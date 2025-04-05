@@ -2,12 +2,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-do
 import LandingPage from "./pages/LandingPage"
 import RecordPage from "./pages/RecordPage"
 import ReportPage from "./pages/ReportPage"
+import About from "./pages/AboutPage";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/about" element={<About/>} />
         <Route path="/record" element={<RecordPage />} />
         <Route path="/report" element={<ReportPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />

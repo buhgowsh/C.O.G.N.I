@@ -67,11 +67,6 @@ body {
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -81,13 +76,6 @@ button {
   font-family: inherit;
   cursor: pointer;
   transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
 @media (prefers-color-scheme: light) {
@@ -183,3 +171,63 @@ button:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+
+
+/* Create a flowing background on a container using a pseudo-element */
+.flowing-bg {
+  position: relative;
+  overflow: hidden; /* Ensures the pseudo-element doesn't cause scrollbars */
+}
+
+.flowing-bg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, #6a11cb, #2575fc, #2b86c5);
+  background-size: 400% 400%;
+  animation: gradientFlow 15s ease infinite;
+  z-index: -1; /* Put it behind the content */
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@font-face {
+  font-family: "future";
+  src: url("assets/futuristic-armour-cufonfonts-webfont/Futuristic Armour.woff") format("woff2"),
+       url("assets/futuristic-armour-cufonfonts-webfont/Futuristic Armour.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-theme{
+  font-family: "future", sans-serif;
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInDown 2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
