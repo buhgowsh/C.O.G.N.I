@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 
-function App() {
+function LandingPage() {
   return (
     <div className="flex items-center justify-center h-screen w-screen">
       <Button>Click me</Button>
@@ -8,4 +8,4 @@ function App() {
   )
 }
 
-export default App
+export default LandingPage
