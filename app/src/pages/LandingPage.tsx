@@ -28,7 +28,7 @@ export default function LandingPage() {
             </p>
             
             {/* Slogan with hover animation */}
-            <p className="text-md md:text-lg text-gray-500 text-shadow-xs
+            <p className="text-md md:text-lg text-gray-500 font-semibold text-shadow-xs
                 transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
               Empower your focus, track your attention, and learn how to lock in.
             </p>
@@ -39,13 +39,13 @@ export default function LandingPage() {
             <Link to="/about" className="w-full sm:w-auto">
               <Button 
                 text="Learn More" 
-                className="w-full sm:w-full py-3 px-6 text-lg font-semibold hover:bg-blue-800 hover:text-white transition duration-300 shadow-lg" 
+                className="w-full sm:w-full py-3 px-6 text-lg font-semibold bg-blue-500 hover:bg-blue-700 hover:text-white transition duration-300 shadow-lg" 
               />
             </Link>
             <Link to="/record" className="w-full sm:w-auto">
               <Button 
                 text="Try it out!" 
-                className="w-full sm:w-full py-3 px-6 text-lg font-semibold bg-blue-600 text-white hover:bg-blue-700 transition duration-300 shadow-lg" 
+                className="w-full sm:w-full py-3 px-6 text-lg font-semibold bg-blue-500 text-white hover:bg-blue-700 transition duration-300 shadow-lg" 
               />
             </Link>
           </div>
