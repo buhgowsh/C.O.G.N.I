@@ -1,22 +1,36 @@
-import { Menu } from "lucide-react"
-import { Link } from "react-router";
+import { Menu } from "lucide-react";
+import { Link } from "react-router-dom"; // Fixed import
 
-
-export default function Navbar(){
-    return (
-        <header className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-200 shadow-sm">
-        <div className="text-3xl font-bold tracking-wide font-theme text-blue-800 font-theme">C.O.G.N.I</div>
-        <nav className="hidden md:flex space-x-4">
-        <Link to="/about">
-              <p className="text-lg font-extrbold">About</p>
-        </Link>
-        <Link to="/record">
-            <p className="text-lg font-extrbold">Lock in</p>
-        </Link>
-        </nav>
-        <div className="md:hidden">
-          <Menu className="w-6 h-6" />
+export default function Navbar() {
+  return (
+    <header className="fixed top-8 left-1/2 -translate-x-1/2 w-[90%] max-5xl px-8 py-3 flex items-center font-theme justify-between border border-blue-700 rounded-3xl shadow-2xl z-50 bg-white/90 backdrop-blur-sm">
+      {/* Logo */}
+      <Link to="/">
+        <div className="text-2xl font-bold tracking-wide text-blue-800 pl-2">
+          C.O.G.N.I
         </div>
-      </header>
-    );
+      </Link>
+      
+      {/* Navigation Links */}
+      <nav className="hidden md:flex items-center space-x-6 pr-2">
+        <Link 
+          to="/about" 
+          className="text-xl font-bold font-extrabold hover:text-blue-600 transition-colors"
+        >
+          About
+        </Link>
+        <Link 
+          to="/record" 
+          className="text-xl font-bold font-extrabold hover:text-blue-600 transition-colors"
+        >
+          Lock inb
+        </Link>
+      </nav>
+      
+      {/* Mobile Menu Button */}
+      <div className="md:hidden pr-2">
+        <Menu className="w-6 h-6" />
+      </div>
+    </header>
+  );
 }
