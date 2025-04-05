@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom"
+import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
 import LandingPage from "./pages/LandingPage"
 import RecordPage from "./pages/RecordPage"
 import ReportPage from "./pages/ReportPage"
