@@ -1,6 +1,9 @@
 function ReportPage() {
     return(
-        <p>hi</p>
+        <div id="Analysis">
+            <h1>Analysis</h1>
+            <p id="data"></p>
+        </div>
     )
 }
 
