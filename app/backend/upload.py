@@ -3,8 +3,6 @@ import os
 from flask_cors import CORS
 import logging
 import time
-import cv2
-import numpy as np
 from pathlib import Path
 
 # Import your video analysis function
@@ -38,22 +36,23 @@ def upload_video():
         os.makedirs(VIDEOS_DIR, exist_ok=True)
         
         # Save as session.mp4 in the videos directory
-        save_path = os.path.join(VIDEOS_DIR, "session.mp4")
+        video_path = os.path.join(VIDEOS_DIR, "session.mp4")
         
-        logger.info(f"Saving video to: {save_path}")
-        video_file.save(save_path)
+        logger.info(f"Saving video to: {video_path}")
+        video_file.save(video_path)
         
-        # Run analysis on the video
+        # Run analysis on the video, explicitly passing the output directory
         logger.info("Starting video analysis...")
-        result = analyze_video(save_path)
-        plot_path = result["plot_path"]
+        result = analyze_video(video_path, output_dir=VIDEOS_DIR)
+        
+        plot_filename = result["plot_filename"]
         stats = result["stats"]
         
         return jsonify({
             "success": True,
             "message": "Video uploaded and analyzed successfully",
-            "filepath": save_path,
-            "plot_url": f"/plots/{os.path.basename(plot_path)}",
+            "filepath": video_path,
+            "plot_url": f"/plots/{plot_filename}",
             "stats": stats
         })
     
@@ -74,14 +73,15 @@ def analyze_latest():
         if not os.path.exists(video_path):
             return jsonify({"error": "No video found for analysis"}), 404
             
-        result = analyze_video(video_path)
-        plot_path = result["plot_path"]
+        # Pass the output directory explicitly
+        result = analyze_video(video_path, output_dir=VIDEOS_DIR)
+        plot_filename = result["plot_filename"]
         stats = result["stats"]
         
         return jsonify({
             "success": True,
             "message": "Video analyzed successfully",
-            "plot_url": f"/plots/{os.path.basename(plot_path)}",
+            "plot_url": f"/plots/{plot_filename}",
             "stats": stats
         })
     except Exception as e:

@@ -11,7 +11,24 @@ matplotlib.use('Agg')
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
-def analyze_video(video_path):
+def analyze_video(video_path, output_dir=None):
+    """
+    Analyze video for eye detection and save plot in the specified output directory.
+    
+    Parameters:
+    - video_path: Path to the video file
+    - output_dir: Directory where the plot should be saved (defaults to video's directory)
+    
+    Returns:
+    - Dictionary with plot path and statistics
+    """
+    # If no output directory is specified, use the video's directory
+    if output_dir is None:
+        output_dir = os.path.dirname(video_path)
+    
+    # Ensure the output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+    
     cap = cv2.VideoCapture(video_path)
     past = time.time()
     timeh = []
@@ -67,8 +84,9 @@ def analyze_video(video_path):
     if sum1 > 0 and binSize > 0:
         data.append([y, sum1 / binSize])
 
-    # Call analyze_data with save_path parameter
-    plot_save_path = os.path.join(os.path.dirname(video_path), "eye_tracking_plot.png")
+    # Save the plot in the specified output directory
+    plot_filename = "eye_tracking_plot.png"
+    plot_save_path = os.path.join(output_dir, plot_filename)
     stats = analyze_data(data, y_min=-0.1, y_max=1.1, title="Eye Tracking Analysis", save_path=plot_save_path)
     
     cap.release()
@@ -77,6 +95,7 @@ def analyze_video(video_path):
     # Return both the image path and the stats
     return {
         "plot_path": plot_save_path,
+        "plot_filename": plot_filename,
         "stats": stats
     }
 
@@ -174,7 +193,7 @@ def analyze_data(data, y_min=0, y_max=1, title="Data Analysis", window_size=None
 
     return stats
 
-def pie_chart(data):
+def pie_chart(data, save_path=None):
     plt.style.use('_mpl-gallery-nogrid')
 
     payingAttention = 0
@@ -203,33 +222,10 @@ def pie_chart(data):
 
     plt.tight_layout()
 
-    plt.show()
-    plt.style.use('_mpl-gallery-nogrid')
-
-    payingAttention = 0
-    notPayingAttention = 0
-
-    for point in data:
-        if point[1] <= 0.5:
-            payingAttention += 1
-        else:
-            notPayingAttention += 1
-
-    # make data
-    x = [payingAttention, notPayingAttention]
-    labels = ['Paying Attention', 'Not Paying Attention']
-    colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
-
-    # plot
-    fig, ax = plt.subplots()
-    ax.pie(x, colors=colors, radius=3, center=(4, 4),
-        wedgeprops={"linewidth": 1, "edgecolor": "white"}, frame=True, autopct='%1.1f%%', labels=labels)
-
-    plt.xticks([])
-    plt.yticks([])
-
-    plt.legend()
-
-    plt.tight_layout()
-
-    plt.show()
+    # Save the pie chart if a path is provided
+    if save_path:
+        plt.savefig(save_path, dpi=100, bbox_inches='tight')
+        print(f"Pie chart saved to: {save_path}")
+        plt.close()
+    else:
+        plt.show()

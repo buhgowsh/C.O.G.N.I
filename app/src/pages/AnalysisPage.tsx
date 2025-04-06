@@ -23,7 +23,6 @@ export default function AnalysisPage() {
       }
       
       const data = await response.json();
-      console.log("Awaiting repsonse....")
       setAnalysisData(data);
     } catch (err) {
       console.error("Failed to fetch analysis data:", err);
@@ -34,15 +33,17 @@ export default function AnalysisPage() {
   };
 
   return (
-    <div className="flex flex-col bg-white text-blue-900 min-h-screen w-full">
+    <div className="flex flex-col bg-white text-blue-900 min-h-screen w-full pt-16 overflow-y-scroll"> {/* Added pt-16 */}
       <Navbar />
       <div className="absolute inset-0 z-0 blur-xs">
         <ParticleComponent />
       </div>
-      <main className="flex-grow flex flex-col items-center justify-center gap-6 px-4 md:px-8 py-12 z-20 ">
-        
+      
+      <main className="flex-grow flex flex-col items-center justify-center gap-6 px-4 md:px-8 py-12 z-20 overflow-y-hidden">
         {loading && (
-          <div className="text-[5rem] font-extrabold text-center text-blue-800 font-theme text-shadow-md">Loading results...</div>
+          <div className="text-[5rem] font-extrabold text-center text-blue-800 font-theme text-shadow-md">
+            Loading results...
+          </div>
         )}
         
         {error && (
@@ -61,8 +62,6 @@ export default function AnalysisPage() {
           <div className="w-full max-w-4xl flex flex-col gap-8">
             <div className="border border-gray-300 rounded-xl p-6 shadow-lg">
               <h2 className="text-2xl font-semibold mb-4 font-theme">Focus Tracking Analysis</h2>
-              
-              
               
               {/* Plot image */}
               <div className="my-6 flex justify-center">
@@ -96,7 +95,9 @@ export default function AnalysisPage() {
                     Total data points: <span className="font-mono">{analysisData.stats.data_count}</span>
                   </p>
                   <p className="text-gray-700">
-                    Time range: <span className="font-mono">{analysisData.stats.x_range[0].toFixed(1)} - {analysisData.stats.x_range[1].toFixed(1)} seconds</span>
+                    Time range: <span className="font-mono">
+                      {analysisData.stats.x_range[0].toFixed(1)} - {analysisData.stats.x_range[1].toFixed(1)} seconds
+                    </span>
                   </p>
                 </div>
               </div>
