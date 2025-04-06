@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/Navbar";
+import ParticleComponent from "@/components/ui/Particles";
 
 export default function AnalysisPage() {
   const [loading, setLoading] = useState(false);
@@ -22,6 +23,7 @@ export default function AnalysisPage() {
       }
       
       const data = await response.json();
+      console.log("Awaiting repsonse....")
       setAnalysisData(data);
     } catch (err) {
       console.error("Failed to fetch analysis data:", err);
@@ -34,11 +36,13 @@ export default function AnalysisPage() {
   return (
     <div className="flex flex-col bg-white text-blue-900 min-h-screen w-full">
       <Navbar />
-
-      <main className="flex-grow flex flex-col items-center justify-center gap-6 px-4 md:px-8 py-12">
+      <div className="absolute inset-0 z-0 blur-xs">
+        <ParticleComponent />
+      </div>
+      <main className="flex-grow flex flex-col items-center justify-center gap-6 px-4 md:px-8 py-12 z-20 ">
         
         {loading && (
-          <div className="text-xl text-gray-600 font-theme">Loading analysis data...</div>
+          <div className="text-[5rem] text-center text-blue-800 font-theme text-shadow-md">Loading results...</div>
         )}
         
         {error && (
