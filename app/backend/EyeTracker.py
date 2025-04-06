@@ -90,6 +90,44 @@ def analyze_data(data, y_min=0, y_max=1, title="Data Analysis", window_size=None
         "data_count": len(data)
     }
 
+# Create a pie chart based on the data passed through
+def pie_chart(data):
+    # Data is assumed to be an array of points
+    plt.style.use('_mpl-gallery-nogrid')
+
+    # Creating the two parts of the pie chart
+    payingAttention = 0
+    notPayingAttention = 0
+
+    # Gathering the data for the parts of the pie chart
+    for point in data:
+        if point[1] <= 0.5:
+            payingAttention += 1
+        else:
+            notPayingAttention += 1
+
+    # make data
+    x = [payingAttention, notPayingAttention]
+    labels = ['Paying Attention', 'Not Paying Attention']
+    colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
+
+    # plot
+    fig, ax = plt.subplots()
+    ax.pie(x, colors=colors, radius=3, center=(4, 4),
+        wedgeprops={"linewidth": 1, "edgecolor": "white"}, frame=True, autopct='%1.1f%%', labels=labels)
+
+    # Ignore the units on the axes
+    plt.xticks([])
+    plt.yticks([])
+
+    # Print the legend
+    plt.legend()
+
+    plt.tight_layout()
+
+    # Display the graph
+    plt.show()
+
 
 # Open webcam
 cap = cv2.VideoCapture("./videos/session.mp4")
