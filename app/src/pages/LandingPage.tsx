@@ -44,7 +44,7 @@ export default function LandingPage() {
             </Link>
             <Link to="/record" className="w-full sm:w-auto">
               <Button 
-                text="Try it out! →" 
+                text="Try it out!" 
                 className="w-full sm:w-full py-3 px-6 text-lg font-semibold bg-blue-500 text-white hover:bg-blue-700 transition duration-300 shadow-lg" 
               />
             </Link>
