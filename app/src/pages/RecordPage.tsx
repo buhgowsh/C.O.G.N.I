@@ -4,35 +4,94 @@ import ParticleComponent from "@/components/ui/Particles";
 
 export default function RecordPage() {
   const [isRecording, setIsRecording] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0); // time in seconds
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<null | "success" | "error">(null);
+  
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const recordedChunks = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
 
   // Webcam feed
   useEffect(() => {
     async function getCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: true,
+          audio: true // Enable audio recording
+        });
+        
+        streamRef.current = stream;
+        
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          mediaRecorderRef.current = new MediaRecorder(stream);
-          mediaRecorderRef.current.ondataavailable = (event) => {
-            chunksRef.current.push(event.data);
-          };
-          mediaRecorderRef.current.onstop = () => {
-            const blob = new Blob(chunksRef.current, { type: "video/webm" });
-            setVideoBlob(blob); // Store the video blob
-          };
         }
+
+        // Check supported MIME types
+        const mimeTypes = [
+          'video/webm;codecs=vp9,opus',
+          'video/webm;codecs=vp8,opus',
+          'video/webm;codecs=h264,opus',
+          'video/webm',
+          'video/mp4'
+        ];
+        
+        // Find the first supported mime type
+        const supportedMimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
+        
+        if (!supportedMimeType) {
+          throw new Error("No supported media recording MIME type found");
+        }
+        
+        console.log("Using MIME type:", supportedMimeType);
+        
+        // Set up media recorder with the supported type
+        mediaRecorderRef.current = new MediaRecorder(stream, {
+          mimeType: supportedMimeType,
+          videoBitsPerSecond: 2500000 // 2.5 Mbps for better quality
+        });
+        
+        mediaRecorderRef.current.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            recordedChunks.current.push(e.data);
+          }
+        };
+
+        mediaRecorderRef.current.onstop = async () => {
+          try {
+            // Get the mime type that was actually used
+            const actualMimeType = mediaRecorderRef.current?.mimeType || 'video/webm';
+            
+            const blob = new Blob(recordedChunks.current, { type: actualMimeType });
+            setVideoBlob(blob);
+            
+            // Create a URL for preview if needed
+            const videoURL = URL.createObjectURL(blob);
+            if (videoRef.current) {
+              videoRef.current.srcObject = null;
+              videoRef.current.src = videoURL;
+              videoRef.current.controls = true;
+            }
+          } catch (err) {
+            console.error("Error processing recording:", err);
+          }
+        };
       } catch (err) {
         console.error("Camera error:", err);
+        alert("Unable to access camera. Please check your permissions.");
       }
     }
 
     getCamera();
+
+    return () => {
+      // Clean up on unmount - stop all tracks
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
   }, []);
 
   // Timer effect
@@ -60,64 +119,146 @@ export default function RecordPage() {
     return `${m}:${s}`;
   };
 
-  // Start/Stop Recording
-  const toggleRecording = () => {
+  // Start/Stop recording
+  const handleStartStopRecording = () => {
     if (isRecording) {
-      mediaRecorderRef.current?.stop(); // Stop recording and trigger 'onstop' to capture video
+      mediaRecorderRef.current?.stop();
+      setIsRecording(false);
+      
+      // When stopping, let's also stop the live camera to show the recording
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
     } else {
-      chunksRef.current = []; // Reset chunks when starting a new recording
-      mediaRecorderRef.current?.start();
+      // If we have a previous recording shown, we need to restart the camera
+      if (!streamRef.current) {
+        getCamera();
+        return; // getCamera will recall this function after setting up
+      }
+      
+      recordedChunks.current = []; // Clear previous recording
+      mediaRecorderRef.current?.start(1000); // Collect data every second
+      setIsRecording(true);
+      setUploadStatus(null); // Reset upload status
+      setVideoBlob(null);
     }
-    setIsRecording((prev) => !prev);
+  };
+  
+  // Helper function to get camera again (for restart)
+  const getCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: true,
+        audio: true
+      });
+      
+      streamRef.current = stream;
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.controls = false;
+      }
+      
+      // Set up media recorder
+      const supportedMimeType = 'video/webm';
+      mediaRecorderRef.current = new MediaRecorder(stream, {
+        mimeType: supportedMimeType
+      });
+      
+      mediaRecorderRef.current.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          recordedChunks.current.push(e.data);
+        }
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const blob = new Blob(recordedChunks.current, { type: supportedMimeType });
+        setVideoBlob(blob);
+        
+        // Create a URL for preview
+        const videoURL = URL.createObjectURL(blob);
+        if (videoRef.current) {
+          videoRef.current.srcObject = null;
+          videoRef.current.src = videoURL;
+          videoRef.current.controls = true;
+        }
+      };
+      
+      // Now that everything is set up, start recording
+      recordedChunks.current = [];
+      mediaRecorderRef.current.start(1000);
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Camera error:", err);
+      alert("Unable to access camera. Please check your permissions.");
+    }
   };
 
-  // Upload video to backend
-  const uploadVideo = async () => {
+  // Upload video
+  const handleUpload = async () => {
     if (!videoBlob) {
       alert("No video to upload");
       return;
     }
 
+    setIsUploading(true);
+    setUploadStatus(null);
+    
+    // Create a file from the blob
+    const mimeType = mediaRecorderRef.current?.mimeType || 'video/webm';
+    const extension = mimeType.includes('mp4') ? 'mp4' : 'webm';
+    const file = new File([videoBlob], `recording.${extension}`, { type: mimeType });
+    
     const formData = new FormData();
-    formData.append("video", videoBlob, "recording.webm");
+    formData.append("video", file);
 
     try {
-      setUploading(true);
-      const response = await fetch("/upload", {
+      console.log("Uploading file:", file.name, "Type:", file.type, "Size:", file.size);
+      
+      const response = await fetch("http://localhost:5000/upload_video", {
         method: "POST",
         body: formData,
       });
-
-      const data = await response.json();
-      console.log("Analysis Result:", data);
-      // Handle the result (e.g., display analysis result)
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server responded with ${response.status}: ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log("Upload response:", result);
+      
+      setUploadStatus("success");
+      alert("Video uploaded successfully!");
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error("Error uploading video:", error);
+      setUploadStatus("error");
+      alert(`Error uploading video: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
-      setUploading(false);
+      setIsUploading(false);
     }
   };
 
   return (
     <div className="flex flex-col bg-white text-blue-900 min-h-screen w-full relative">
-      {/* Particle Background */}
       <div className="absolute inset-0 z-10 blur-xs">
-        {!isRecording ? <ParticleComponent /> : <></>}
+        {!isRecording ? <ParticleComponent/> : <></>}
       </div>
-  
+
       <Navbar />
-  
+
       <main className="flex-grow flex flex-col items-center justify-center gap-12 px-4 md:px-8 py-16 z-10">
-        {/* Session Indicator + Timer */}
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
             <div
               className={`h-4 w-4 rounded-full transition-all duration-300 shadow-md ${
-                isRecording ? "bg-red-500 animate-pulse" : "bg-green-400"
+                isRecording ? "bg-red-500 animate-pulse" : videoBlob ? "bg-blue-500" : "bg-green-400"
               }`}
             />
             <span className="text-lg font-medium tracking-wide text-gray-700">
-              {isRecording ? "Recording" : "Not recording"}
+              {isRecording ? "Recording" : videoBlob ? "Recorded" : "Ready"}
+              {isUploading && " (Uploading...)"}
             </span>
           </div>
           {isRecording && (
@@ -126,39 +267,44 @@ export default function RecordPage() {
             </span>
           )}
         </div>
-  
-        {/* Enlarged Video Box */}
-        <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-blue-700 bg-white max-w-[800px] w-full h-[500px]">
+
+        <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-blue-700 bg-black max-w-[800px] w-full h-[500px]">
           <video
             ref={videoRef}
             autoPlay
             playsInline
-            muted
+            muted={isRecording} // Only mute during recording to prevent feedback
             className="w-full h-full object-cover"
           />
         </div>
-  
-        {/* Buttons - Start/Stop & Upload */}
-        <div className="flex flex-row gap-6 mt-4">
+
+        <div className="flex flex-row gap-4 items-center">
           <button
-            onClick={toggleRecording}
+            onClick={handleStartStopRecording}
+            disabled={isUploading}
             className={`py-3 px-8 text-lg font-semibold rounded-xl shadow-md transition duration-300 ${
               isRecording
                 ? "bg-red-500 text-white hover:bg-red-600"
+                : videoBlob
+                ? "bg-yellow-500 text-white hover:bg-yellow-600"
                 : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
+            } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            {isRecording ? "Stop Recording" : "Start Recording"}
+            {isRecording ? "Stop Recording" : videoBlob ? "Record Again" : "Start Recording"}
           </button>
-  
+
           {/* Upload Button */}
-          {videoBlob && !isRecording && (
+          {!isRecording && videoBlob && (
             <button
-              onClick={uploadVideo}
-              className="py-3 px-8 text-lg font-semibold rounded-xl shadow-md bg-green-500 text-white hover:bg-green-600"
-              disabled={uploading}
+              onClick={handleUpload}
+              disabled={isUploading}
+              className={`py-3 px-8 text-lg font-semibold rounded-xl shadow-md transition-colors ${
+                isUploading ? "bg-yellow-500" : uploadStatus === "success" ? "bg-green-600" : uploadStatus === "error" ? "bg-red-600" : "bg-green-600"
+              } text-white hover:${
+                uploadStatus === "error" ? "bg-red-700" : "bg-green-700"
+              } ${isUploading ? "opacity-70 cursor-wait" : ""}`}
             >
-              {uploading ? "Uploading..." : "Upload Video →"}
+              {isUploading ? "Uploading..." : "Upload Video"}
             </button>
           )}
         </div>
