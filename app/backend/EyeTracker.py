@@ -4,6 +4,9 @@ import time
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
+# Use Agg backend which doesn't require a display
+matplotlib.use('Agg')
 
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
@@ -44,36 +47,40 @@ def analyze_video(video_path):
     totTime = int(math.floor(curr - past))
     
     binSize = len(timeh) // (totTime * 2)
+    if binSize == 0:  # Protect against division by zero
+        binSize = 1
+        
     binRem = len(timeh) % (totTime * 2)
     totSize = len(timeh) - binRem
 
     data = []
     sum1 = 0
     y = .5
-    for x in range(totSize + 1):
+    for x in range(min(totSize + 1, len(timeh))):
         if x % binSize == 0 and x != 0:
             data.append([y, sum1 / binSize])
             sum1 = 0
             y += .5
         sum1 += timeh[x]
-
-    analyze_data(data, y_min=-0.1, y_max=1.1, title="Data with Fixed Y-Axis")
     
+    # If we have any remaining data to process
+    if sum1 > 0 and binSize > 0:
+        data.append([y, sum1 / binSize])
 
+    # Call analyze_data with save_path parameter
+    plot_save_path = os.path.join(os.path.dirname(video_path), "eye_tracking_plot.png")
+    stats = analyze_data(data, y_min=-0.1, y_max=1.1, title="Eye Tracking Analysis", save_path=plot_save_path)
+    
     cap.release()
     cv2.destroyAllWindows()
 
-    import matplotlib.pyplot as plt
+    # Return both the image path and the stats
+    return {
+        "plot_path": plot_save_path,
+        "stats": stats
+    }
 
-    # Save the plot as an image (e.g., plot.png) in the same directory as the video
-    plot_save_path = os.path.join(os.path.dirname(video_path), "plot.png")
-    plt.savefig(plot_save_path)
-    plt.close()  # Close the plot to free up memory
-
-    # Optionally return the path to the plot if needed for further processing
-    return plot_save_path
-
-def analyze_data(data, y_min=0, y_max=1, title="Data Analysis", window_size=None):
+def analyze_data(data, y_min=0, y_max=1, title="Data Analysis", window_size=None, save_path=None):
     """
     Analyze and plot data with a trend line and moving average.
     
@@ -82,8 +89,13 @@ def analyze_data(data, y_min=0, y_max=1, title="Data Analysis", window_size=None
     - y_min, y_max: Fixed y-axis limits
     - title: Plot title
     - window_size: Size of moving average window (defaults to ~10% of data points)
+    - save_path: Path to save the plot image
     """
-
+    if not data:
+        print("No data to analyze")
+        return {
+            "error": "No data to analyze"
+        }
 
     # Extract x and y values
     x = [point[0] for point in data]
@@ -91,17 +103,17 @@ def analyze_data(data, y_min=0, y_max=1, title="Data Analysis", window_size=None
 
     # Set default window size if not provided
     if window_size is None:
-        window_size = max(5, len(data) // 10) # Default to ~10% of data points, minimum 5
+        window_size = max(3, len(data) // 10)  # Default to ~10% of data points, minimum 3
 
     # Calculate trend line
     z = np.polyfit(x, y, 1)
     p = np.poly1d(z)
 
     # create the plot
-    plt.figure(figsize=(12, 6)) # Create a large figure for better visibility
+    plt.figure(figsize=(12, 6))  # Create a large figure for better visibility
 
-    # Plot data points
-    #plt.scatter(x, y, color='blue', s=20, alpha=0.7, label='Data')
+    # Plot data points with connecting lines
+    plt.plot(x, y, 'bo-', markersize=4, alpha=0.5, label='Raw data')
 
     # Plot trend line
     x_line = np.linspace(min(x), max(x), 1000)
@@ -115,41 +127,49 @@ def analyze_data(data, y_min=0, y_max=1, title="Data Analysis", window_size=None
             moving_avg.append(window_avg)
 
         moving_avg_x = x[window_size-1:][:len(moving_avg)]
-        plt.plot(moving_avg_x, moving_avg, 'g--', linewidth=1.5,
+        plt.plot(moving_avg_x, moving_avg, 'g-', linewidth=2.0,
                  label=f'Moving avg (window={window_size})')
 
     # Add grid for better readability
     plt.grid(True, linestyle='--', alpha=0.7)
 
     # Set the plot and limits
-    x_padding = (max(x) - min(x)) * 0.02 # 2% padding on each side
+    x_padding = (max(x) - min(x)) * 0.05  # 5% padding on each side
     plt.xlim(min(x) - x_padding, max(x) + x_padding)
     plt.ylim(y_min, y_max)
 
     # Add labels, title, and legend
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
+    plt.xlabel('Time (seconds)')
+    plt.ylabel('Eye Detection Score')
     plt.title(title)
     plt.legend()
 
-    # Show plot
-    plt.tight_layout() # Adjust the layout
-    plt.show()
+    # Improve visual appearance
+    plt.tight_layout()  # Adjust the layout
+    
+    # Save the plot to the specified path instead of showing it
+    if save_path:
+        plt.savefig(save_path, dpi=100, bbox_inches='tight')
+        print(f"Plot saved to: {save_path}")
+    
+    # Close the plot to free memory
+    plt.close()
 
-    # Print the trend line equation
-    print(f"Trend line equation: y = {z[0]:.6f}x + {z[1]:.6f}")
-
-    # Additional statistics
+    # Calculate statistics
     avg_y = sum(y) / len(y)
-    print(f"Average y=value: {avg_y:.6f}")
+    stats = {
+        "slope": float(z[0]),
+        "intercept": float(z[1]),
+        "average_y": float(avg_y),
+        "x_range": (float(min(x)), float(max(x))),
+        "y_range": (float(min(y)), float(max(y))),
+        "data_count": len(data)
+    }
+    
+    # Print the statistics for debugging
+    print(f"Trend line equation: y = {z[0]:.6f}x + {z[1]:.6f}")
+    print(f"Average y-value: {avg_y:.6f}")
     print(f"Data range: x from {min(x):.2f} to {max(x):.2f}, y from {min(y):.2f} to {max(y):.2f}")
     print(f"Number of data points: {len(data)}")
 
-    return {
-        "slope": z[0],
-        "intercept": z[1],
-        "average_y": avg_y,
-        "x_range": (min(y), max(x)),
-        "y_range": (min(y), max(y)),
-        "data_count": len(data)
-    }
+    return stats
