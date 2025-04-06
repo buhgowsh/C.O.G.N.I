@@ -42,7 +42,7 @@ export default function AnalysisPage() {
       <main className="flex-grow flex flex-col items-center justify-center gap-6 px-4 md:px-8 py-12 z-20 ">
         
         {loading && (
-          <div className="text-[5rem] text-center text-blue-800 font-theme text-shadow-md">Loading results...</div>
+          <div className="text-[5rem] font-extrabold text-center text-blue-800 font-theme text-shadow-md">Loading results...</div>
         )}
         
         {error && (
@@ -61,6 +61,8 @@ export default function AnalysisPage() {
           <div className="w-full max-w-4xl flex flex-col gap-8">
             <div className="border border-gray-300 rounded-xl p-6 shadow-lg">
               <h2 className="text-2xl font-semibold mb-4 font-theme">Focus Tracking Analysis</h2>
+              
+              
               
               {/* Plot image */}
               <div className="my-6 flex justify-center">

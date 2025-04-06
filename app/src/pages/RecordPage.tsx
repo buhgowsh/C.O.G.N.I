@@ -238,13 +238,14 @@ export default function RecordPage() {
       console.log("Upload response:", result);
       
       setUploadStatus("success");
-      alert("Video uploaded successfully and ready for OpenCV processing!");
+      alert("Video uploaded successfully and ready for data processing!");
     } catch (error) {
       console.error("Error uploading video:", error);
       setUploadStatus("error");
       alert(`Error uploading video: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsUploading(false);
+      window.location.href = "report";
     }
   };
 
