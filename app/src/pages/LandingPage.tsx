@@ -17,7 +17,7 @@ export default function LandingPage() {
           {/* Large Title with hover animation */}
           <h1 className="text-[10rem] font-bold tracking-tight text-blue-800 font-theme tracking-wide mb-2 text-shadow-sm 
               transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:scale-[1.01]">
-            C.O.G.N.I  
+            C.O.G.N.I <p className="ml-6 inline">AI</p> 
           </h1>
           
           <div className="w-full h-auto relative bottom-10">
@@ -44,7 +44,7 @@ export default function LandingPage() {
             </Link>
             <Link to="/record" className="w-full sm:w-auto">
               <Button 
-                text="Try it out!" 
+                text="Try it out! →" 
                 className="w-full sm:w-full py-3 px-6 text-lg font-semibold bg-blue-500 text-white hover:bg-blue-700 transition duration-300 shadow-lg" 
               />
             </Link>

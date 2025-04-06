@@ -7,7 +7,7 @@ export default function Navbar() {
       {/* Logo */}
       <Link to="/">
         <div className="text-2xl font-bold tracking-wide text-blue-800 pl-2">
-          C.O.G.N.I
+          COGNI
         </div>
       </Link>
       
