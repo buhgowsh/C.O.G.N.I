@@ -138,7 +138,7 @@ export default function AnalysisPage() {
           {analysisData && !loading && !error && (
             <>
               <div className="border border-blue-700 rounded-3xl shadow-2xl z-50 bg-white/90 backdrop-blur-sm rounded-xl p-6">
-                <h2 className="text-2xl font-semibold mb-4 font-theme">Focus Tracking Analysis</h2>
+                <h2 className="text-2xl font-semibold mb-4 font-theme">Focus Analysis</h2>
                 
                 <div className="my-6 flex justify-center">
                   <img 
