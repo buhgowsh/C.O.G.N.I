@@ -92,7 +92,7 @@ def analyze_data(data, y_min=0, y_max=1, title="Data Analysis", window_size=None
 
 
 # Open webcam
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("./videos/session.mp4")
 past = time.time()
 timeh = []
 while True:

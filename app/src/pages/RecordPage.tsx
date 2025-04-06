@@ -5,14 +5,14 @@ import ParticleComponent from "@/components/ui/Particles";
 export default function RecordPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
+  const [videoBlob, setVideoBlob] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState<null | "success" | "error">(null);
+  const [uploadStatus, setUploadStatus] = useState(null);
   
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recordedChunks = useRef<Blob[]>([]);
-  const streamRef = useRef<MediaStream | null>(null);
+  const videoRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const recordedChunks = useRef([]);
+  const streamRef = useRef(null);
 
   // Webcam feed
   useEffect(() => {
@@ -29,13 +29,13 @@ export default function RecordPage() {
           videoRef.current.srcObject = stream;
         }
 
-        // Check supported MIME types
+        // Prefer MP4 format for better OpenCV compatibility
         const mimeTypes = [
+          'video/mp4',
+          'video/webm;codecs=h264,opus',
           'video/webm;codecs=vp9,opus',
           'video/webm;codecs=vp8,opus',
-          'video/webm;codecs=h264,opus',
-          'video/webm',
-          'video/mp4'
+          'video/webm'
         ];
         
         // Find the first supported mime type
@@ -62,7 +62,7 @@ export default function RecordPage() {
         mediaRecorderRef.current.onstop = async () => {
           try {
             // Get the mime type that was actually used
-            const actualMimeType = mediaRecorderRef.current?.mimeType || 'video/webm';
+            const actualMimeType = mediaRecorderRef.current?.mimeType || 'video/mp4';
             
             const blob = new Blob(recordedChunks.current, { type: actualMimeType });
             setVideoBlob(blob);
@@ -96,7 +96,7 @@ export default function RecordPage() {
 
   // Timer effect
   useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
+    let timer = null;
 
     if (isRecording) {
       timer = setInterval(() => {
@@ -113,7 +113,7 @@ export default function RecordPage() {
   }, [isRecording]);
 
   // Format elapsed time as MM:SS
-  const formatTime = (seconds: number) => {
+  const formatTime = (seconds) => {
     const m = String(Math.floor(seconds / 60)).padStart(2, "0");
     const s = String(seconds % 60).padStart(2, "0");
     return `${m}:${s}`;
@@ -160,8 +160,15 @@ export default function RecordPage() {
         videoRef.current.controls = false;
       }
       
-      // Set up media recorder
-      const supportedMimeType = 'video/webm';
+      // Try to use MP4 for better OpenCV compatibility
+      const mimeTypes = [
+        'video/mp4',
+        'video/webm;codecs=h264,opus',
+        'video/webm'
+      ];
+      
+      const supportedMimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type)) || 'video/webm';
+      
       mediaRecorderRef.current = new MediaRecorder(stream, {
         mimeType: supportedMimeType
       });
@@ -205,10 +212,10 @@ export default function RecordPage() {
     setIsUploading(true);
     setUploadStatus(null);
     
-    // Create a file from the blob
-    const mimeType = mediaRecorderRef.current?.mimeType || 'video/webm';
-    const extension = mimeType.includes('mp4') ? 'mp4' : 'webm';
-    const file = new File([videoBlob], `recording.${extension}`, { type: mimeType });
+    // Always create file as session.mp4 for OpenCV processing
+    const file = new File([videoBlob], "session.mp4", { 
+      type: mediaRecorderRef.current?.mimeType || 'video/mp4' 
+    });
     
     const formData = new FormData();
     formData.append("video", file);
@@ -216,7 +223,8 @@ export default function RecordPage() {
     try {
       console.log("Uploading file:", file.name, "Type:", file.type, "Size:", file.size);
       
-      const response = await fetch("http://localhost:5000/upload_video", {
+      // Add a query parameter to indicate we want to save with the opencv script
+      const response = await fetch("http://localhost:5000/upload_video?save_with_opencv=true", {
         method: "POST",
         body: formData,
       });
@@ -230,7 +238,7 @@ export default function RecordPage() {
       console.log("Upload response:", result);
       
       setUploadStatus("success");
-      alert("Video uploaded successfully!");
+      alert("Video uploaded successfully and ready for OpenCV processing!");
     } catch (error) {
       console.error("Error uploading video:", error);
       setUploadStatus("error");
