@@ -1,9 +1,19 @@
+import ImageAnalyzer from "@/components/api/ImageAnalyzer"
 import Navbar from "@/components/ui/Navbar"
 import ParticleComponent from "@/components/ui/Particles"
 
 function ReportPage() {
+
+    const apiKey = process.env.OPENAI_API_KEY || ''
+
     return (
         <div className="flex flex-col bg-white text-blue-900 min-h-screen w-full">
+
+        {/*idk where this should be put*/}
+        <div className="container mx-auto py-8">
+        <ImageAnalyzer apiKey={apiKey} />
+        </div>
+
             <Navbar />
             {/*Particles*/}
             <div className="absolute inset-0 z-0 blur-xs">
