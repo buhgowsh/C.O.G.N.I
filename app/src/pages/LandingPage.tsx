@@ -30,7 +30,7 @@ export default function LandingPage() {
             {/* Slogan with hover animation */}
             <p className="text-md md:text-lg text-gray-500 font-semibold text-shadow-xs
                 transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
-              Empower your focus, track your attention, and learn how to lock in.
+              Empower your focus, track your attention, and learn how to lock in!
             </p>
           </div>
           
@@ -44,7 +44,7 @@ export default function LandingPage() {
             </Link>
             <Link to="/record" className="w-full sm:w-auto">
               <Button 
-                text="Try it out!" 
+                text="Try it out" 
                 className="w-full sm:w-full py-3 px-6 text-lg font-semibold bg-blue-500 text-white hover:bg-blue-700 transition duration-300 shadow-lg" 
               />
             </Link>

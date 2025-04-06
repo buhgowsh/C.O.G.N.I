@@ -23,7 +23,7 @@ export default function Navbar() {
           to="/record" 
           className="text-xl font-bold font-extrabold hover:text-blue-600 transition-colors"
         >
-          Lock in
+          Focus
         </Link>
       </nav>
       
