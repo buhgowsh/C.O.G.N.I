@@ -30,7 +30,7 @@ export default function LandingPage() {
             {/* Slogan with hover animation */}
             <p className="text-md md:text-lg text-gray-500 font-semibold text-shadow-xs
                 transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
-              Empower your focus, track your attention, and learn how to lock in!
+                Track Your Gaze. Train Your Brain.
             </p>
           </div>
           

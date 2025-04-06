@@ -258,14 +258,14 @@ export default function RecordPage() {
       <Navbar />
 
       <main className="flex-grow flex flex-col items-center justify-center gap-12 px-4 md:px-8 py-16 z-10">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 mt-10">
           <div className="flex items-center gap-3">
             <div
               className={`h-4 w-4 rounded-full transition-all duration-300 shadow-md ${
                 isRecording ? "bg-red-500 animate-pulse" : videoBlob ? "bg-blue-500" : "bg-green-400"
               }`}
             />
-            <span className="text-lg font-medium tracking-wide text-gray-700">
+            <span className="text-2xl font-extrabold tracking-wide text-gray-700 font-theme">
               {isRecording ? "Recording" : videoBlob ? "Recorded" : "Ready"}
               {isUploading && " (Uploading...)"}
             </span>
@@ -277,7 +277,7 @@ export default function RecordPage() {
           )}
         </div>
 
-        <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-blue-700 bg-black max-w-[800px] w-full h-[500px]">
+        <div className="rounded-2xl overflow-hidden shadow-xl border-blue-700 bg-black max-w-[800px] w-full h-[500px]">
           <video
             ref={videoRef}
             autoPlay
@@ -295,7 +295,7 @@ export default function RecordPage() {
               isRecording
                 ? "bg-red-500 text-white hover:bg-red-600"
                 : videoBlob
-                ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                ? "bg-blue-500 text-white hover:bg-blue-600"
                 : "bg-blue-600 text-white hover:bg-blue-700"
             } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
           >
