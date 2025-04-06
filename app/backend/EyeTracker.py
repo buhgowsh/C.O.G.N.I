@@ -1,13 +1,77 @@
+import os
 import cv2
 import time
 import math
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
-# Load Haar cascade classifiers for face and eyes
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
 
+def analyze_video(video_path):
+    cap = cv2.VideoCapture(video_path)
+    past = time.time()
+    timeh = []
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
+        eyes = []
+
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            roi_gray = gray[y:y + h, x:x + w]
+            roi_color = frame[y:y + h, x:x + w]
+            eyes = eye_cascade.detectMultiScale(roi_gray, scaleFactor=1.1, minNeighbors=10)
+            for (ex, ey, ew, eh) in eyes:
+                cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2)
+
+        if len(eyes) > 0:
+            timeh.append(1)
+        else:
+            timeh.append(0)
+
+        cv2.imshow('Eye Detection', frame)
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    curr = time.time()
+    totTime = int(math.floor(curr - past))
+    
+    binSize = len(timeh) // (totTime * 2)
+    binRem = len(timeh) % (totTime * 2)
+    totSize = len(timeh) - binRem
+
+    data = []
+    sum1 = 0
+    y = .5
+    for x in range(totSize + 1):
+        if x % binSize == 0 and x != 0:
+            data.append([y, sum1 / binSize])
+            sum1 = 0
+            y += .5
+        sum1 += timeh[x]
+
+    analyze_data(data, y_min=-0.1, y_max=1.1, title="Data with Fixed Y-Axis")
+    
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+    import matplotlib.pyplot as plt
+
+    # Save the plot as an image (e.g., plot.png) in the same directory as the video
+    plot_save_path = os.path.join(os.path.dirname(video_path), "plot.png")
+    plt.savefig(plot_save_path)
+    plt.close()  # Close the plot to free up memory
+
+    # Optionally return the path to the plot if needed for further processing
+    return plot_save_path
 
 def analyze_data(data, y_min=0, y_max=1, title="Data Analysis", window_size=None):
     """
@@ -89,105 +153,3 @@ def analyze_data(data, y_min=0, y_max=1, title="Data Analysis", window_size=None
         "y_range": (min(y), max(y)),
         "data_count": len(data)
     }
-
-# Create a pie chart based on the data passed through
-def pie_chart(data):
-    # Data is assumed to be an array of points
-    plt.style.use('_mpl-gallery-nogrid')
-
-    # Creating the two parts of the pie chart
-    payingAttention = 0
-    notPayingAttention = 0
-
-    # Gathering the data for the parts of the pie chart
-    for point in data:
-        if point[1] <= 0.5:
-            payingAttention += 1
-        else:
-            notPayingAttention += 1
-
-    # make data
-    x = [payingAttention, notPayingAttention]
-    labels = ['Paying Attention', 'Not Paying Attention']
-    colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
-
-    # plot
-    fig, ax = plt.subplots()
-    ax.pie(x, colors=colors, radius=3, center=(4, 4),
-        wedgeprops={"linewidth": 1, "edgecolor": "white"}, frame=True, autopct='%1.1f%%', labels=labels)
-
-    # Ignore the units on the axes
-    plt.xticks([])
-    plt.yticks([])
-
-    # Print the legend
-    plt.legend()
-
-    plt.tight_layout()
-
-    # Display the graph
-    plt.show()
-
-
-# Open webcam
-cap = cv2.VideoCapture("./videos/session.mp4")
-past = time.time()
-timeh = []
-while True:
-
-    ret, frame = cap.read()
-    if not ret:
-        break
-
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Detect faces
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
-    eyes = []
-    for (x, y, w, h) in faces:
-        # Draw rectangle around face
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-        roi_gray = gray[y:y+h, x:x+w]
-        roi_color = frame[y:y+h, x:x+w]
-
-        # Detect eyes within the face
-        eyes = eye_cascade.detectMultiScale(roi_gray, scaleFactor=1.1, minNeighbors=10)
-        for (ex, ey, ew, eh) in eyes:
-            cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
-    #print(len(eyes) > 0)
-    if len(eyes) > 0:
-        timeh.append(1)
-    else:
-        timeh.append(0)
-    cv2.imshow('Eye Detection', frame)
-
-    # Press Q to quit
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-curr = time.time()
-
-print(len(timeh))
-totTime = int(math.floor(curr - past))
-print(totTime)
-
-binSize = len(timeh)//(totTime*2)
-binRem = len(timeh)%(totTime*2)
-totSize = len(timeh) - binRem
-print(str(binSize) +" " + str(binRem) + " " + str(totSize))
-
-data = []
-sum1 = 0
-y = .5
-for x in range(totSize+1):
-    if x%binSize == 0 and x != 0:
-        print(x)
-        data.append([y,sum1/binSize])
-        sum1 = 0
-        y += .5
-    sum1 += timeh[x]
-print(data)
-
-analyze_data(data, y_min=-0.1, y_max=1.1, title="Data with Fixed Y-Axis")
-
-cap.release()
-cv2.destroyAllWindows()

@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
 import os
-from flask_cors import CORS
 import logging
+from flask_cors import CORS
+from EyeTracker import analyze_video  # Import the function to analyze video
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -30,15 +31,19 @@ def upload_video():
         videos_dir = os.path.join(SCRIPT_DIR, "videos")
         os.makedirs(videos_dir, exist_ok=True)
         
-        # Save as session.mp4 in the videos directory
+        # Save the video file as session.mp4 in the videos directory
         save_path = os.path.join(videos_dir, "session.mp4")
         
         logger.info(f"Saving video to: {save_path}")
         video_file.save(save_path)
         
+        # Call the analyze_video function AFTER saving the video
+        logger.info(f"Analyzing video at: {save_path}")
+        analyze_video(save_path)
+        
         return jsonify({
             "success": True,
-            "message": "Video uploaded successfully as session.mp4",
+            "message": "Video uploaded and analyzed successfully",
             "filepath": save_path
         })
     
@@ -47,7 +52,7 @@ def upload_video():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # Create videos directory at startup
+    # No need to run analyze_video here; it will be triggered after file upload
     videos_dir = os.path.join(SCRIPT_DIR, "videos")
     os.makedirs(videos_dir, exist_ok=True)
     
