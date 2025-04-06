@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, send_from_directory, request  # Flask's request
 import os
 from flask_cors import CORS
+import shutil
 import logging
 import time
 import requests  # For external API calls
@@ -135,9 +136,11 @@ def analyze_latest():
             return jsonify({"error": "No video found for analysis"}), 404
             
         # Pass the output directory explicitly
+        print("Before API call")
         result = analyze_video(video_path, output_dir=VIDEOS_DIR)
         plot_filename = result["plot_filename"]
         stats = result["stats"]
+        print("After API call")
         
         return jsonify({
             "success": True,
@@ -148,9 +151,26 @@ def analyze_latest():
     except Exception as e:
         logger.error(f"Error analyzing video: {str(e)}")
         return jsonify({"error": str(e)}), 500
+    
+def deleteFiles():
+    # Clear out the contents of the videos directory if it exists
+    if os.path.exists(VIDEOS_DIR):
+        for filename in os.listdir(VIDEOS_DIR):
+            file_path = os.path.join(VIDEOS_DIR, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)  # Remove file or link
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)  # Remove directory
+            except Exception as e:
+                print(f'Failed to delete {file_path}. Reason: {e}')
+    else:
+        os.makedirs(VIDEOS_DIR)
 
 if __name__ == '__main__':
+
     # Create videos directory at startup
+    deleteFiles()
     os.makedirs(VIDEOS_DIR, exist_ok=True)
     
     logger.info(f"Server starting. Videos directory: {VIDEOS_DIR}")

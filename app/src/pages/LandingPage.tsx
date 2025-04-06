@@ -15,14 +15,17 @@ export default function LandingPage() {
       <main className="flex flex-grow items-center justify-center px-4 md:px-8 z-20">
         <div className="flex flex-col text-center w-full gap-2 fade-in">
           {/* Large Title with hover animation */}
-          <h1 className="text-[10rem] font-bold tracking-tight text-blue-800 font-theme tracking-wide mb-2 text-shadow-sm 
+          <div className="flex justify-center items-center mb-2">
+           
+          </div>
+          <h1 className="text-[7rem] font-bold tracking-tight text-blue-800 font-theme tracking-wide mb-4 text-shadow-sm 
               transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:scale-[1.01]">
             N.O.V.A <p className="ml-6 inline">AI</p> 
           </h1>
           
-          <div className="w-full h-auto relative bottom-10">
+          <div className="w-full h-auto relative bottom-5">
             {/* Description with hover animation */}
-            <p className="text-2xl md:text-2xl font-semibold text-blue-500 mb-6 text-shadow-xs
+            <p className="text-3xl md:text-3xl font-semibold text-blue-500 mb-4 text-shadow-xs
                 transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
               Neural Optimization with Visual Analysis 
             </p>

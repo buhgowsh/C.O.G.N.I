@@ -28,19 +28,22 @@ def analyze_video(video_path, output_dir=None):
     
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
-    
+    print("Make dirs")
     cap = cv2.VideoCapture(video_path)
     past = time.time()
     timeh = []
+    print("capture video")
 
     while True:
         ret, frame = cap.read()
+        print("capture read")
         if not ret:
             break
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
         eyes = []
+        print("analyze face")
 
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
@@ -50,15 +53,18 @@ def analyze_video(video_path, output_dir=None):
             for (ex, ey, ew, eh) in eyes:
                 cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2)
 
+        print("math calculated")
+        
         if len(eyes) > 0:
             timeh.append(1)
         else:
             timeh.append(0)
 
-        cv2.imshow('Eye Detection', frame)
-        
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        print("time")
+
+        #cv2.imshow('Eye Detection', frame)
+        #if cv2.waitKey(1) & 0xFF == ord('q'):
+            # break
 
     curr = time.time()
     totTime = int(math.floor(curr - past))
@@ -91,6 +97,7 @@ def analyze_video(video_path, output_dir=None):
     
     cap.release()
     cv2.destroyAllWindows()
+    print("Exiting API")
 
     # Return both the image path and the stats
     return {

@@ -206,8 +206,8 @@ button {
 
 @font-face {
   font-family: "future";
-  src: url("assets/futuristic-armour-cufonfonts-webfont/Futuristic Armour.woff") format("woff2"),
-       url("assets/futuristic-armour-cufonfonts-webfont/Futuristic Armour.woff") format("woff");
+  src: url("assets/constance-2-cufonfonts-webfont/Constance-7BLXE.woff") format("woff2"),
+       url("assets/constance-2-cufonfonts-webfont/Constance-7BLXE.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }

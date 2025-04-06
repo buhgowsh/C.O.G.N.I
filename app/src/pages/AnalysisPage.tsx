@@ -32,7 +32,9 @@ export default function AnalysisPage() {
     setError(null);
     
     try {
+      console.log("Before API");
       const response = await fetch("http://localhost:5000/analyze_latest");
+      console.log("After API");
       
       if (!response.ok) {
         throw new Error(`Error: ${response.status} - ${response.statusText}`);
@@ -125,15 +127,12 @@ export default function AnalysisPage() {
           )}
           
           {error && (
-            <div className="text-xl text-red-600 p-4 bg-red-100 rounded-lg">
-              Error: {error}
               <button 
                 onClick={fetchAnalysisData}
                 className="mt-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Try Again
               </button>
-            </div>
           )}
           
           {analysisData && !loading && !error && (
@@ -178,25 +177,25 @@ export default function AnalysisPage() {
                   </div>
                 </div>
                 
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg text-blue-800">
-                  <h3 className="font-semibold text-lg mb-2">Analysis Summary</h3>
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg text-blue-800 transition-opacity duration-1000 ease-in-out opacity-100">
+                  <h3 className="font-semibold text-lg mb-2">Insightful Summary</h3>
                   <p>
                     {analysisData.stats.average_y > 0.7 ? (
-                      "Your focus level was excellent throughout the session!"
+                      "Fantastic job! Your attention levels were consistently high, showing strong engagement throughout the session."
                     ) : analysisData.stats.average_y > 0.5 ? (
-                      "Your focus level was good, with some room for improvement."
+                      "You maintained a fairly good level of focus, though there's room to enhance sustained attention over time."
                     ) : (
-                      "Your focus level could use improvement. Try to maintain eye contact with the screen!"
+                      "It looks like your focus wavered a bit during the session. That’s okay! There are simple habits you can build to improve it."
                     )}
                   </p>
                   {analysisData.stats.slope > 0 ? (
-                    <p className="mt-2">Your focus improved over the course of the session.</p>
+                    <p className="mt-2">Positive trend: your focus sharpened as the session progressed — keep that momentum going!</p>
                   ) : (
-                    <p className="mt-2">Your focus decreased over the course of the session.</p>
+                    <p className="mt-2">Your focus gradually declined. Try shorter sessions or take breaks to maintain sharpness.</p>
                   )}
-                </div>
               </div>
-              
+            </div>
+            
               <div className="flex justify-center gap-4">
                 <button 
                   onClick={() => window.location.href = "/record"}
