@@ -204,8 +204,6 @@ def pie_chart(data):
     plt.tight_layout()
 
     plt.show()
-
-def pie_chart(data):
     plt.style.use('_mpl-gallery-nogrid')
 
     payingAttention = 0
