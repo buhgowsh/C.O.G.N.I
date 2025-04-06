@@ -204,3 +204,34 @@ def pie_chart(data):
     plt.tight_layout()
 
     plt.show()
+
+def pie_chart(data):
+    plt.style.use('_mpl-gallery-nogrid')
+
+    payingAttention = 0
+    notPayingAttention = 0
+
+    for point in data:
+        if point[1] <= 0.5:
+            payingAttention += 1
+        else:
+            notPayingAttention += 1
+
+    # make data
+    x = [payingAttention, notPayingAttention]
+    labels = ['Paying Attention', 'Not Paying Attention']
+    colors = plt.get_cmap('Blues')(np.linspace(0.2, 0.7, len(x)))
+
+    # plot
+    fig, ax = plt.subplots()
+    ax.pie(x, colors=colors, radius=3, center=(4, 4),
+        wedgeprops={"linewidth": 1, "edgecolor": "white"}, frame=True, autopct='%1.1f%%', labels=labels)
+
+    plt.xticks([])
+    plt.yticks([])
+
+    plt.legend()
+
+    plt.tight_layout()
+
+    plt.show()
