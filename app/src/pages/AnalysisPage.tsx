@@ -117,7 +117,7 @@ export default function AnalysisPage() {
         <ParticleComponent />
       </div>
       
-      <main className="flex-grow flex flex-col items-center px-4 md:px-8 py-12 z-20">
+      <main className="flex-grow flex flex-col justify-center items-center px-4 md:px-8 py-12 z-20">
         {/* Centered analytics box */}
         <div className="w-full max-w-4xl flex flex-col gap-8">
           {loading && (

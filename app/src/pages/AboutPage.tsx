@@ -15,8 +15,8 @@ export default function AboutPage() {
       {/* Main Content */}
       <main className="flex-grow min-h-screen w-full px-6 md:px-20 py-16 flex flex-col gap-12 items-center justify-center z-10 ">
         <section className="max-w-4xl text-center space-y-4 fade-in">
-          <p className="text-xl text-extrabold text-gray-900 text-shadow-xs ">
-            <strong>N.O.V.A</strong> stands for <em>"Neural Optimization with Visual Analysis"d</em>.
+          <p className="text-xl text-extrabold text-gray-900 text-shadow-xs "><h2 className="text-[4rem] font-semibold font-theme text-center text-blue-700 text-shadow-s mb-8">About</h2>
+            <strong>N.O.V.A</strong> stands for <em>"Neural Optimization with Visual Analysis"</em>.
             <p>AI stemmed from a deep understanding of the unique challenges faced by individuals who suffer from attention deficit, particularly in maintaining consistent focus and managing cognitive overload in a world designed for neurotypical minds. Many of us on the team have either personally experienced or closely witnessed the struggles that come with conditions like ADHD, autism, and anxiety, where traditional productivity tools often fall short. 
           </p>
           </p>
